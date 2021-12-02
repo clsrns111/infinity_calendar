@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>Plan Calender</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- <div class="detail">
+      <div class="detail_from">
+        <p class="detail_from_year">
+          <span class="detail_from_year_text"></span>년
+        </p>
+        <p class="detail_from_month">
+          <span class="detail_from_month_text"></span>월
+        </p>
+        <p class="detail_from_day">
+          <span class="detail_from_day_text"></span>일 부터
+        </p>
+      </div>
+      <div class="detail_to">
+        <p class="detail_to_year">
+          <span class="detail_to_year_text"></span>년
+        </p>
+        <p class="detail_to_month">
+          <span class="detail_to_month_text"></span>월
+        </p>
+        <p class="detail_to_day">
+          <span class="detail_to_day_text"></span>일 까지
+        </p>
+      </div>
+    </div> -->
+    <div class="slider" id="slider">
+      <div class="wrapper">
+        <div class="calenders">
+          <div class="calender">
+            <div class="calender_img_container">
+              <img
+                src="https://cdn.pixabay.com/photo/2017/05/09/03/46/alberta-2297204__480.jpg"
+                alt=""
+              />
+              <h4><span class="img_text"></span>월</h4>
+            </div>
+            <main class="calender_main">
+              <div class="days">
+                <div class="day">일</div>
+                <div class="day">월</div>
+                <div class="day">화</div>
+                <div class="day">수</div>
+                <div class="day">목</div>
+                <div class="day">금</div>
+                <div class="day">토</div>
+              </div>
+              <div class="calender_main_line"></div>
+              <div class="dates"></div>
+            </main>
+          </div>
+          <div class="calender">
+            <div class="calender_img_container">
+              <img
+                src="https://cdn.pixabay.com/photo/2017/08/30/01/05/milky-way-2695569__340.jpg"
+                alt=""
+              />
+              <h4><span class="img_text"></span>1월</h4>
+            </div>
+            <main class="calender_main">
+              <div class="days">
+                <div class="day">일</div>
+                <div class="day">월</div>
+                <div class="day">화</div>
+                <div class="day">수</div>
+                <div class="day">목</div>
+                <div class="day">금</div>
+                <div class="day">토</div>
+              </div>
+              <div class="calender_main_line"></div>
+              <div class="dates">
+                <div class="date">1</div>
+                <div class="date">2</div>
+                <div class="date">3</div>
+                <div class="date">4</div>
+                <div class="date">5</div>
+                <div class="date">6</div>
+                <div class="date">7</div>
+                <div class="date">8</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+                <div class="date">1</div>
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="year_month">
+      <div class="year_month_text">
+        <div class="left"><i class="fas fa-caret-left"></i></div>
+        <p>
+          <span class="year_current"></span> 년
+          <span class="month_current"></span> 월
+        </p>
+        <div class="right"><i class="fas fa-caret-right"></i></div>
+      </div>
+    </nav>
+
+    <script type="module" src="App.js"></script>
+  </body>
+</html>
