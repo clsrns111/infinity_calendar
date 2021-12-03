@@ -2,7 +2,7 @@
 
 :root {
   --slider-width: 500px;
-  --slider-height: 650px;
+  --slider-height: 600px;
 }
 
 * {
@@ -31,6 +31,8 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   width: var(--slider-width);
   height: var(--slider-height);
 }
@@ -150,8 +152,8 @@ body {
 }
 
 .date {
-  margin: 5px 30px;
-  margin-left: 28px;
+  margin: 5px 25px;
+  margin-left: 33px;
   width: 10px;
   cursor: pointer;
   opacity: 0.7;
