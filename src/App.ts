@@ -1,30 +1,31 @@
 import { Calender } from "./Calender.js";
 import { Rendering } from "./Rendering.js";
-import { $ } from "./util.js";
+import { $, $All } from "./util.js";
 
 const date = new Date();
 let nowMonth: number = date.getMonth() + 1;
 let nowYear: number = date.getFullYear();
 let today: number = date.getDate();
 let targetCalendar: HTMLElement;
-let totalIdx = 0;
 let posInitial;
+let allow = true;
 
 class App {
   private calenders: HTMLElement;
+  private totalIdx: number;
 
   constructor(
     appRoot: HTMLElement,
     nowYear: number,
     nowMonth: number,
-    today: number,
-    dir?: -1
+    today: number
   ) {
     this.calenders = appRoot;
+    this.totalIdx = 0;
 
-    new Rendering(nowYear, nowMonth, today, appRoot);
+    new Rendering(nowYear, nowMonth, today, appRoot, this.totalIdx);
+
     this.timeCheck();
-
     this.arrowFunction(".left");
     this.arrowFunction(".right");
   }
@@ -39,26 +40,56 @@ class App {
     arrow.addEventListener("click", (e) => {
       this.calenders.classList.add("shifting");
       posInitial = this.calenders.offsetLeft;
-
       if (dir == ".left") {
         this.calenders.style.left = posInitial + 500 + "px";
-        totalIdx = -1;
-
+        this.totalIdx--;
+        posInitial += 500;
         if (nowMonth > 1) nowMonth--;
         else {
           nowYear = nowYear - 1;
           nowMonth = 12;
         }
+
+        const length = $All(".calender").length;
+        if (this.totalIdx <= -1 && allow) {
+          new Calender(nowYear, nowMonth, today).leftArrow(
+            $(".calenders")! as HTMLElement,
+            this.totalIdx,
+            length,
+            posInitial,
+            allow
+          );
+          allow = false;
+          $(".calenders")!.addEventListener(
+            "transitionend",
+            () => (allow = true)
+          );
+        }
       }
 
       if (dir == ".right") {
         this.calenders.style.left = posInitial - 500 + "px";
-        totalIdx = 1;
-
+        this.totalIdx++;
+        posInitial += -500;
         if (nowMonth < 12) nowMonth++;
         else {
           nowYear = nowYear + 1;
           nowMonth = 1;
+        }
+
+        const length = $All(".calender").length;
+        if (this.totalIdx >= 1 && allow) {
+          console.log(nowYear, nowMonth);
+          new Calender(nowYear, nowMonth, today).rightArrow(
+            $(".calenders")! as HTMLElement,
+            length,
+            allow
+          );
+          allow = false;
+          $(".calenders")!.addEventListener(
+            "transitionend",
+            () => (allow = true)
+          );
         }
       }
       this.timeCheck();

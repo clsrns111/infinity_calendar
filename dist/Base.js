@@ -4,14 +4,39 @@ export class Base {
         template.innerHTML = html;
         this.element = template.content.firstElementChild;
     }
-    attachTo(target, position) {
+    attachTo(target, position, idx) {
         target.insertAdjacentElement(position, this.element);
+        this.element.style.left = -500 + "px";
     }
-    insertBefore(target, position) {
-        target.insertAdjacentElement(position, this.element);
-        this.element.style.left = -1500 + "px";
+    insertBefore(target, position, idx) {
+        if (idx !== 1) {
+            console.log(idx);
+            target.insertAdjacentElement(position, this.element);
+            this.element.style.left = -500 + "px";
+        }
     }
-    clear() {
-        this.element.remove();
+    rightArrow(target, length, allow) {
+        this.element.style.left = -1000 + "px";
+        target.appendChild(this.element);
+        target.addEventListener("transitionend", () => {
+            target.classList.remove("shifting");
+        });
+    }
+    leftArrow(target, idx, length, posInitial, allow) {
+        if (allow) {
+            console.log(posInitial);
+            this.element.style.left = -(length * 500 + posInitial) + "px";
+            target.appendChild(this.element);
+            // target.insertAdjacentElement("afterbegin", this.element);
+            target.addEventListener("transitionend", () => {
+                target.classList.remove("shifting");
+                // this.checkIdx(target, idx, length);
+            });
+            // this.element.style.left = -((length + 3) * 500) + "px";
+        }
+    }
+    checkIdx(target, idx, length) {
+        target.style.left = -(length * 500) + "px";
+        idx = length - 1;
     }
 }
