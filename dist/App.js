@@ -12,53 +12,116 @@ class App {
     constructor(appRoot, nowYear, nowMonth, today) {
         this.calenders = appRoot;
         this.totalIdx = 0;
+        this.start = 0;
+        this.end = 0;
         new Rendering(nowYear, nowMonth, today, appRoot, this.totalIdx);
         this.timeCheck();
         this.arrowFunction(".left");
         this.arrowFunction(".right");
+        this.allDates = $All(".dates");
+        this.dateClick();
     }
     timeCheck() {
         $(".month_current").textContent = `${nowMonth}`;
         $(".year_current").textContent = `${nowYear}`;
+    }
+    dateClick() {
+        this.allDates.forEach((date) => date.addEventListener("click", (e) => {
+            var _a;
+            console.log(e);
+            const t = e.target;
+            const target = t.closest(".date");
+            const dates = target.parentElement.childNodes;
+            let num = Number(target.textContent);
+            if (!target.querySelector("form")) {
+                target.insertAdjacentHTML("beforeend", "<form type='submit'><input autofocus='true' max='30' class='todo_input' placeholder='  해야할일을 입력해주세요'/></form>");
+            }
+            (_a = $All("form")) === null || _a === void 0 ? void 0 : _a.forEach((form) => {
+                form.addEventListener("submit", (e) => {
+                    e.preventDefault();
+                    const form = target.querySelector("form");
+                    const input = target.querySelector(".todo_input");
+                    const input_value = input.value;
+                    form.remove();
+                    target.insertAdjacentHTML("beforeend", `<small class='todo_text'>${input_value}</small>`);
+                });
+            });
+            // if (!this.start) {
+            //   this.start = num;
+            //   target.classList.add("todo");
+            // }
+            // if (this.start < num) {
+            //   this.end = num;
+            // }
+            // if (this.start > num) {
+            //   let tem = this.start;
+            //   this.start = num;
+            //   this.end = tem;
+            // }
+            // console.log("start", this.start);
+            // console.log("end", this.end);
+            // function _filter(
+            //   dates: NodeListOf<HTMLElement> | any,
+            //   predi: (date: HTMLElement) => string | null
+            // ) {
+            //   let newarr: NodeListOf<HTMLElement>[] = [];
+            //   for (let i = 0; i < dates.length; i++) {
+            //     if (predi(dates[i])) {
+            //       newarr.push(dates[i]);
+            //     }
+            //   }
+            //   return newarr;
+            // }
+            // const filtered = _filter(dates, (date) => date.textContent);
+            // for (let i = 0; i <= filtered.length; i++) {
+            //   const div = document.createElement("div");
+            //   div.setAttribute("class", "line");
+            //   if (i >= this.start && i <= this.end) {
+            //     console.log(filtered[i - 1]);
+            //     const target = filtered[i - 1]! as HTMLElement | any;
+            //     target.classList.add("todo");
+            //   }
+            // }
+        }));
+    }
+    arrowRender(posInitial, length, allow, dir) {
+        new Calender(nowYear, nowMonth, today).arrow($(".calenders"), this.totalIdx, length, posInitial, allow);
+        // $(".calenders")!.addEventListener("transitionend", () => (allow = true));
+        this.allDates = $All(".dates");
+        this.dateClick();
     }
     arrowFunction(dir) {
         const arrow = $(dir);
         arrow.addEventListener("click", (e) => {
             this.calenders.classList.add("shifting");
             posInitial = this.calenders.offsetLeft;
+            const length = $All(".calender").length;
             if (dir == ".left") {
-                this.calenders.style.left = posInitial + 500 + "px";
+                this.calenders.style.left = posInitial + 1200 + "px";
                 this.totalIdx--;
-                posInitial += 500;
+                posInitial += 1200;
                 if (nowMonth > 1)
                     nowMonth--;
                 else {
                     nowYear = nowYear - 1;
                     nowMonth = 12;
                 }
-                const length = $All(".calender").length;
                 if (this.totalIdx <= -1 && allow) {
-                    new Calender(nowYear, nowMonth, today).leftArrow($(".calenders"), this.totalIdx, length, posInitial, allow);
-                    allow = false;
-                    $(".calenders").addEventListener("transitionend", () => (allow = true));
+                    this.arrowRender(posInitial, length, allow, dir);
                 }
             }
             if (dir == ".right") {
-                this.calenders.style.left = posInitial - 500 + "px";
+                this.calenders.style.left = posInitial - 1200 + "px";
                 this.totalIdx++;
-                posInitial += -500;
+                posInitial -= 1200;
                 if (nowMonth < 12)
                     nowMonth++;
                 else {
                     nowYear = nowYear + 1;
                     nowMonth = 1;
                 }
-                const length = $All(".calender").length;
                 if (this.totalIdx >= 1 && allow) {
-                    console.log(nowYear, nowMonth);
-                    new Calender(nowYear, nowMonth, today).rightArrow($(".calenders"), length, allow);
-                    allow = false;
-                    $(".calenders").addEventListener("transitionend", () => (allow = true));
+                    this.arrowRender(posInitial, length, allow, dir);
                 }
             }
             this.timeCheck();

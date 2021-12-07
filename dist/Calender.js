@@ -1,12 +1,14 @@
 import { Base } from "./Base.js";
 export class Calender extends Base {
+    // <img
+    //       src="https://cdn.pixabay.com/photo/2017/05/09/03/46/alberta-2297204__480.jpg"
+    //       alt=""
+    //     />
     constructor(nowYear, nowMonth, today) {
         super(`<div class="calender">
     <div class="calender_img_container">
-      <img
-        src="https://cdn.pixabay.com/photo/2017/05/09/03/46/alberta-2297204__480.jpg"
-        alt=""
-      />
+      <div class="calender_todo">
+      </div>
       <h4><span class="img_text"></span>월</h4>
     </div>
     <main class="calender_main">
@@ -30,6 +32,13 @@ export class Calender extends Base {
         this.dates = [];
         this.sunDay = [];
         this.render();
+        const dates = this.element.querySelector(".dates");
+        dates.onclick = () => {
+            this.clickListener && this.clickListener();
+        };
+    }
+    setClickListener(listener) {
+        this.clickListener = listener;
     }
     sunDayCheck(day) {
         if (day === 1)
@@ -82,10 +91,7 @@ export class Calender extends Base {
             datesEl.innerHTML += `<div class="date"></div>`;
         }
         for (let i = 1; i <= this.Month_day; i++) {
-            if (i < 10)
-                this.dates.push(`<div class="date">&nbsp;&nbsp;${i}</div>`);
-            else
-                this.dates.push(`<div class="date">${i}</div>`);
+            this.dates.push(`<div class="date">${i}</div>`);
         }
         this.dates.forEach((date) => {
             datesEl.innerHTML += date;

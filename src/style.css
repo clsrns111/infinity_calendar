@@ -1,8 +1,8 @@
 @import url(//font.elice.io/EliceDigitalBaeum.css);
 
 :root {
-  --slider-width: 500px;
-  --slider-height: 600px;
+  --slider-width: 1200px;
+  --slider-height: 850px;
 }
 
 * {
@@ -31,8 +31,6 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
   width: var(--slider-width);
   height: var(--slider-height);
 }
@@ -42,11 +40,11 @@ body {
   position: relative;
   top: 0;
   width: 10000px;
-  left: 00px;
+  left: 0px;
 }
 
 .calenders.shifting {
-  transition: left 0.5s ease-out;
+  transition: left 0.4s ease-out;
 }
 
 .calender {
@@ -55,52 +53,65 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: all 1s;
+
   position: relative;
 }
 
 .calender_main {
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  height: 50%;
+  height: 80%;
 }
 
 .calender_img_container {
   width: var(--slider-width);
-  height: 300px;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
+  height: 00px;
 }
 
-.calender_img_container img {
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+.calender_img_container .calender_todo {
+  display: flex;
+}
+
+.calender_todo h3 {
   width: 100%;
-  height: 100%;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  opacity: 0.4;
 }
 
 .calender_img_container h4 {
   position: relative;
-  right: -75%;
-  top: -30%;
-  font-size: 50px;
-  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 300px;
+  top: 100px;
+  color: black;
+  opacity: 0.05;
 }
 
 .year_month {
-  margin-top: 10px;
+  position: relative;
+  background-color: #617482;
+  width: var(--slider-width);
+  height: 100px;
+  margin: 0 auto;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
 }
 
 .year_month_text {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 16px;
-  opacity: 0.6;
-  width: 15%;
+  font-size: 20px;
+  width: 20%;
   height: 30px;
   margin: 0 auto;
-  margin-top: 80px;
+  margin-top: 20px;
+  color: white;
+  top: 30px;
 }
 
 .year_month_text p {
@@ -108,36 +119,16 @@ body {
   text-align: center;
 }
 
-.month_current {
-  transform: translateY(110%);
-}
-
-@keyframes loopContentSlide {
-  0% {
-    transform: translateY(110%);
-  }
-  20% {
-    transform: translateY(0%);
-  }
-  40% {
-    transform: translateY(0%);
-  }
-  50% {
-    transform: translateY(-110%);
-  }
-  100% {
-    transform: translateY(-110%);
-  }
-}
-
 .left {
   margin-right: 25px;
   cursor: pointer;
+  z-index: 2;
 }
 
 .right {
   margin-left: 25px;
   cursor: pointer;
+  z-index: 2;
 }
 
 .days {
@@ -146,18 +137,18 @@ body {
   font-size: 17px;
   justify-content: center;
   font-weight: 600;
+  position: relative;
+  top: -20px;
 }
 
 .day {
-  margin: 27px;
-  margin-left: 25px;
+  margin: 10px 70px;
 }
 
 .calender_main_line {
-  border: 0.5px solid black;
   width: 90%;
   margin: 0 auto;
-  margin-bottom: 10px;
+  margin-bottom: 100px;
 }
 
 .today {
@@ -180,25 +171,70 @@ body {
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;
-  margin: 0 auto;
+  position: relative;
+  top: -120px;
+  margin: 15px 40px;
 }
 
 .date {
-  margin: 5px 25px;
-  margin-left: 33px;
-  width: 10px;
+  border: 1px solid black;
+  font-size: 20px;
   cursor: pointer;
-  opacity: 0.7;
+  width: 160px;
+  height: 120px;
+  float: left;
+  overflow: auto;
 }
 
-.tool {
+.todo_input {
+  outline: none;
+  border: none;
+  font-size: 13px;
+  border-bottom: 1px solid black;
+  background-color: transparent;
+  width: 150px;
+  top: 12px;
+  margin: 2px;
+  display: flex;
+  position: relative;
+  font-family: "Elice Digital Baeum", sans-serif;
+}
+
+.todo_text {
+  display: block;
+}
+
+.tools {
   position: relative;
   top: 700px;
   font-size: 30px;
-  border: 1px solid black;
-  width: 500px;
+  background-color: #617482;
+  border-radius: 22px;
+  width: 50px;
   display: flex;
   margin: 0 auto;
   height: 50px;
-  border-radius: 20px;
+  transition: 0.3s ease-in;
+}
+
+.tools.hover {
+  width: 200px;
+  font-size: 25px;
+  position: relative;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  color: white;
+}
+
+.tools .fa-ellipsis-h {
+  color: white;
+  display: flex;
+  position: relative;
+  top: 10px;
+  margin: 0 auto;
+}
+
+.tool {
+  z-index: 999;
 }
