@@ -1,12 +1,10 @@
 import { Calender } from "./Calender.js";
-import { Rendering } from "./Rendering.js";
 import { $, $All } from "./util.js";
 
 const date = new Date();
 let nowMonth: number = date.getMonth() + 1;
 let nowYear: number = date.getFullYear();
 let today: number = date.getDate();
-let targetCalendar: HTMLElement;
 let posInitial: number;
 let posFinal: number;
 let allow = true;
@@ -23,6 +21,7 @@ class App {
   private posX2: number;
   private threshold: number;
   private item: HTMLElement;
+  private mainCalendar: Calender;
 
   constructor(
     appRoot: HTMLElement,
@@ -38,7 +37,8 @@ class App {
     this.posX2 = 0;
     this.threshold = 100;
 
-    new Rendering(nowYear, nowMonth, today, appRoot, this.totalIdx);
+    this.mainCalendar = new Calender(nowYear, nowMonth, today);
+    this.mainCalendar.attachTo(appRoot, "afterbegin");
 
     this.timeCheck();
     this.arrowFunction(".left");
@@ -48,10 +48,10 @@ class App {
 
     this.item = $(".calenders")! as HTMLElement;
     this.item.classList.add("shifting");
-    this.item.onmousedown = this.dragStart;
-    this.item.addEventListener("touchstart", this.dragStart.bind(this));
+    this.item.onmousedown = this.dragStart.bind(this);
     this.item.addEventListener("touchmove", this.dragAction.bind(this));
     this.item.addEventListener("touchend", this.dragEnd.bind(this));
+    this.item.addEventListener("touchstart", this.dragStart.bind(this));
   }
 
   private timeCheck() {
@@ -142,16 +142,16 @@ class App {
   }
 
   private dragStart(e: any) {
-    posInitial = this.item!.offsetLeft;
-
     drag = true;
+    posInitial = this.item.offsetLeft;
 
     if (e.type == "touchstart") {
       this.posX1 = e.touches[0].clientX;
     } else {
       this.posX1 = e.clientX;
-      document.onmouseup = this.dragEnd;
-      document.onmousemove = this.dragAction;
+      console.log(this.posX1);
+      document.onmouseup = this.dragEnd.bind(this);
+      document.onmousemove = this.dragAction.bind(this);
     }
   }
 
@@ -163,6 +163,7 @@ class App {
       this.posX2 = this.posX1 - e.clientX;
       this.posX1 = e.clientX;
     }
+
     this.item.style.left = this.item.offsetLeft - this.posX2 + "px";
   }
 
@@ -229,7 +230,6 @@ class App {
       this.totalIdx = 0;
 
       empty++;
-      console.log(empty);
     }
 
     $(".calenders")!.addEventListener("transitionend", () => (allow = true));

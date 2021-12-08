@@ -5,14 +5,8 @@ export class Base {
         this.element = template.content.firstElementChild;
         this.width = this.element.clientWidth;
     }
-    attachTo(target, position, idx) {
+    attachTo(target, position) {
         target.insertAdjacentElement(position, this.element);
-    }
-    insertBefore(target, position, idx) {
-        if (idx !== 1) {
-            target.insertAdjacentElement(position, this.element);
-            this.element.style.left = -1200 + "px";
-        }
     }
     rightArrow(target, length, allow, idx, empty, posInitial) {
         target.appendChild(this.element);

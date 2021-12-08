@@ -12,15 +12,8 @@ export class Base<T extends HTMLElement> {
     this.width = this.element.clientWidth;
   }
 
-  attachTo(target: HTMLElement, position: InsertPosition, idx: number) {
+  attachTo(target: HTMLElement, position: InsertPosition) {
     target.insertAdjacentElement(position, this.element);
-  }
-
-  insertBefore(target: HTMLElement, position: InsertPosition, idx: number) {
-    if (idx !== 1) {
-      target.insertAdjacentElement(position, this.element);
-      this.element.style.left = -1200 + "px";
-    }
   }
 
   rightArrow(

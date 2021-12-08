@@ -1,11 +1,9 @@
 import { Calender } from "./Calender.js";
-import { Rendering } from "./Rendering.js";
 import { $, $All } from "./util.js";
 const date = new Date();
 let nowMonth = date.getMonth() + 1;
 let nowYear = date.getFullYear();
 let today = date.getDate();
-let targetCalendar;
 let posInitial;
 let posFinal;
 let allow = true;
@@ -20,7 +18,8 @@ class App {
         this.posX1 = 0;
         this.posX2 = 0;
         this.threshold = 100;
-        new Rendering(nowYear, nowMonth, today, appRoot, this.totalIdx);
+        this.mainCalendar = new Calender(nowYear, nowMonth, today);
+        this.mainCalendar.attachTo(appRoot, "afterbegin");
         this.timeCheck();
         this.arrowFunction(".left");
         this.arrowFunction(".right");
@@ -28,10 +27,10 @@ class App {
         // this.dateClick();
         this.item = $(".calenders");
         this.item.classList.add("shifting");
-        this.item.onmousedown = this.dragStart;
-        this.item.addEventListener("touchstart", this.dragStart.bind(this));
+        this.item.onmousedown = this.dragStart.bind(this);
         this.item.addEventListener("touchmove", this.dragAction.bind(this));
         this.item.addEventListener("touchend", this.dragEnd.bind(this));
+        this.item.addEventListener("touchstart", this.dragStart.bind(this));
     }
     timeCheck() {
         $(".month_current").textContent = `${nowMonth}`;
@@ -98,15 +97,16 @@ class App {
         }));
     }
     dragStart(e) {
-        posInitial = this.item.offsetLeft;
         drag = true;
+        posInitial = this.item.offsetLeft;
         if (e.type == "touchstart") {
             this.posX1 = e.touches[0].clientX;
         }
         else {
             this.posX1 = e.clientX;
-            document.onmouseup = this.dragEnd;
-            document.onmousemove = this.dragAction;
+            console.log(this.posX1);
+            document.onmouseup = this.dragEnd.bind(this);
+            document.onmousemove = this.dragAction.bind(this);
         }
     }
     dragAction(e) {
@@ -163,7 +163,6 @@ class App {
             new Calender(nowYear, nowMonth, today).leftArrow($(".calenders"), this.totalIdx, length, posInitial, allow);
             this.totalIdx = 0;
             empty++;
-            console.log(empty);
         }
         $(".calenders").addEventListener("transitionend", () => (allow = true));
         this.allDates = $All(".dates");
