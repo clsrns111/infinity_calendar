@@ -14,10 +14,28 @@ export class Base<T extends HTMLElement> {
 
   attachTo(target: HTMLElement, position: InsertPosition, idx: number) {
     target.insertAdjacentElement(position, this.element);
-    this.element.style.left = -1200 + "px";
   }
 
-  arrow(
+  insertBefore(target: HTMLElement, position: InsertPosition, idx: number) {
+    if (idx !== 1) {
+      target.insertAdjacentElement(position, this.element);
+      this.element.style.left = -1200 + "px";
+    }
+  }
+
+  rightArrow(
+    target: HTMLElement,
+    length: number,
+    allow: boolean,
+    idx: number,
+    empty: number,
+    posInitial: number
+  ) {
+    target.appendChild(this.element);
+    this.element.style.left = empty * -1200 + "px";
+  }
+
+  leftArrow(
     target: HTMLElement,
     idx: number,
     length: number,

@@ -7,9 +7,18 @@ export class Base {
     }
     attachTo(target, position, idx) {
         target.insertAdjacentElement(position, this.element);
-        this.element.style.left = -1200 + "px";
     }
-    arrow(target, idx, length, posInitial, allow) {
+    insertBefore(target, position, idx) {
+        if (idx !== 1) {
+            target.insertAdjacentElement(position, this.element);
+            this.element.style.left = -1200 + "px";
+        }
+    }
+    rightArrow(target, length, allow, idx, empty, posInitial) {
+        target.appendChild(this.element);
+        this.element.style.left = empty * -1200 + "px";
+    }
+    leftArrow(target, idx, length, posInitial, allow) {
         target.appendChild(this.element);
         this.element.style.left = -(length * 1200 + posInitial) + "px";
         target.addEventListener("transitionend", () => {

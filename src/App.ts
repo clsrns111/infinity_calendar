@@ -7,8 +7,11 @@ let nowMonth: number = date.getMonth() + 1;
 let nowYear: number = date.getFullYear();
 let today: number = date.getDate();
 let targetCalendar: HTMLElement;
-let posInitial;
+let posInitial: number;
+let posFinal: number;
 let allow = true;
+let drag = false;
+let empty = 0;
 
 class App {
   private calenders: HTMLElement;
@@ -16,6 +19,10 @@ class App {
   private allDates: NodeListOf<Element>;
   private start: number;
   private end: number;
+  private posX1: number;
+  private posX2: number;
+  private threshold: number;
+  private item: HTMLElement;
 
   constructor(
     appRoot: HTMLElement,
@@ -27,15 +34,24 @@ class App {
     this.totalIdx = 0;
     this.start = 0;
     this.end = 0;
+    this.posX1 = 0;
+    this.posX2 = 0;
+    this.threshold = 100;
 
     new Rendering(nowYear, nowMonth, today, appRoot, this.totalIdx);
 
     this.timeCheck();
     this.arrowFunction(".left");
     this.arrowFunction(".right");
-
     this.allDates = $All(".dates");
-    this.dateClick();
+    // this.dateClick();
+
+    this.item = $(".calenders")! as HTMLElement;
+    this.item.classList.add("shifting");
+    this.item.onmousedown = this.dragStart;
+    this.item.addEventListener("touchstart", this.dragStart.bind(this));
+    this.item.addEventListener("touchmove", this.dragAction.bind(this));
+    this.item.addEventListener("touchend", this.dragEnd.bind(this));
   }
 
   private timeCheck() {
@@ -44,9 +60,10 @@ class App {
   }
 
   dateClick() {
+    if (drag) return;
+
     this.allDates.forEach((date) =>
       date.addEventListener("click", (e) => {
-        console.log(e);
         const t = e.target! as HTMLElement;
         const target = t.closest(".date")! as HTMLElement;
         const dates = target.parentElement!.childNodes;
@@ -124,27 +141,104 @@ class App {
     );
   }
 
-  private arrowRender(
-    posInitial: number,
-    length: number,
-    allow: boolean,
-    dir: ".left" | ".right"
-  ) {
-    new Calender(nowYear, nowMonth, today).arrow(
-      $(".calenders")! as HTMLElement,
-      this.totalIdx,
-      length,
-      posInitial,
-      allow
-    );
+  private dragStart(e: any) {
+    posInitial = this.item!.offsetLeft;
 
-    // $(".calenders")!.addEventListener("transitionend", () => (allow = true));
+    drag = true;
 
-    this.allDates = $All(".dates");
-    this.dateClick();
+    if (e.type == "touchstart") {
+      this.posX1 = e.touches[0].clientX;
+    } else {
+      this.posX1 = e.clientX;
+      document.onmouseup = this.dragEnd;
+      document.onmousemove = this.dragAction;
+    }
   }
 
-  private arrowFunction(dir: string) {
+  private dragAction(e: any) {
+    if (e.type == "touchmove") {
+      this.posX2 = this.posX1 - e.touches[0].clientX;
+      this.posX1 = e.touches[0].clientX;
+    } else {
+      this.posX2 = this.posX1 - e.clientX;
+      this.posX1 = e.clientX;
+    }
+    this.item.style.left = this.item.offsetLeft - this.posX2 + "px";
+  }
+
+  dragEnd(e: any) {
+    posFinal = this.item.offsetLeft;
+    this.item.classList.add("shifting");
+    const length = $All(".calender").length;
+
+    if (posFinal - posInitial < -50) {
+      this.item.style.left = posInitial - 1200 + "px";
+      this.totalIdx++;
+
+      posInitial -= 1200;
+
+      if (nowMonth < 12) nowMonth++;
+      else {
+        nowYear = nowYear + 1;
+        nowMonth = 1;
+      }
+
+      this.arrowRender(posInitial, length, allow, "right");
+    } else if (posFinal - posInitial > 50) {
+      this.calenders.style.left = posInitial + 1200 + "px";
+      this.totalIdx--;
+      posInitial += 1200;
+
+      if (nowMonth > 1) nowMonth--;
+      else {
+        nowYear = nowYear - 1;
+        nowMonth = 12;
+      }
+
+      this.arrowRender(posInitial, length, allow, "left");
+    } else {
+      this.item.style.left = posInitial + "px";
+    }
+
+    document.onmouseup = null;
+    document.onmousemove = null;
+    drag = false;
+  }
+
+  arrowRender(posInitial: number, length: number, allow: boolean, dir: string) {
+    if (this.totalIdx == length) {
+      new Calender(nowYear, nowMonth, today).rightArrow(
+        $(".calenders")! as HTMLElement,
+        length,
+        allow,
+        this.totalIdx,
+        empty,
+        posInitial
+      );
+    }
+
+    if (this.totalIdx == -1) {
+      new Calender(nowYear, nowMonth, today).leftArrow(
+        $(".calenders")! as HTMLElement,
+        this.totalIdx,
+        length,
+        posInitial,
+        allow
+      );
+
+      this.totalIdx = 0;
+
+      empty++;
+      console.log(empty);
+    }
+
+    $(".calenders")!.addEventListener("transitionend", () => (allow = true));
+    this.allDates = $All(".dates");
+    this.dateClick();
+    this.timeCheck();
+  }
+
+  arrowFunction(dir: string) {
     const arrow = $(dir)! as HTMLElement;
 
     arrow.addEventListener("click", (e) => {
@@ -155,6 +249,7 @@ class App {
       if (dir == ".left") {
         this.calenders.style.left = posInitial + 1200 + "px";
         this.totalIdx--;
+
         posInitial += 1200;
 
         if (nowMonth > 1) nowMonth--;
@@ -162,9 +257,8 @@ class App {
           nowYear = nowYear - 1;
           nowMonth = 12;
         }
-        if (this.totalIdx <= -1 && allow) {
-          this.arrowRender(posInitial, length, allow, dir);
-        }
+
+        this.arrowRender(posInitial, length, allow, "left");
       }
 
       if (dir == ".right") {
@@ -177,11 +271,8 @@ class App {
           nowYear = nowYear + 1;
           nowMonth = 1;
         }
-        if (this.totalIdx >= 1 && allow) {
-          this.arrowRender(posInitial, length, allow, dir);
-        }
+        this.arrowRender(posInitial, length, allow, "right");
       }
-      this.timeCheck();
     });
   }
 }
