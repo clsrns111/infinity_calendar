@@ -1,6 +1,13 @@
 import { Calender } from "./Calender.js";
 import { $, $All } from "./util.js";
 
+interface todoList {
+  year: number;
+  month: number;
+  day: number;
+  body: string;
+}
+
 const date = new Date();
 let nowMonth: number = date.getMonth() + 1;
 let nowYear: number = date.getFullYear();
@@ -22,6 +29,7 @@ class App {
   private threshold: number;
   private item: HTMLElement;
   private mainCalendar: Calender;
+  private todoList: Array<object>;
 
   constructor(
     appRoot: HTMLElement,
@@ -44,7 +52,7 @@ class App {
     this.arrowFunction(".left");
     this.arrowFunction(".right");
     this.allDates = $All(".dates");
-    // this.dateClick();
+    this.dateClick();
 
     this.item = $(".calenders")! as HTMLElement;
     this.item.classList.add("shifting");
@@ -52,6 +60,44 @@ class App {
     this.item.addEventListener("touchmove", this.dragAction.bind(this));
     this.item.addEventListener("touchend", this.dragEnd.bind(this));
     this.item.addEventListener("touchstart", this.dragStart.bind(this));
+    this.dateFetch();
+  }
+
+  private dateRender(dates?: Array<object>) {
+    const Alldate = $All(".date");
+
+    console.log(nowYear, nowMonth);
+    console.log(dates);
+    dates?.forEach((date, idx) => {
+      let { year, month, day, body } = date! as any;
+      if (nowYear === year && nowMonth === month) {
+        Alldate.forEach((el) => {
+          const n = Number(el.firstChild?.textContent);
+
+          if (n === day) {
+            el.insertAdjacentHTML(
+              "beforeend",
+              `<small class='todo_text'>${body}</small>`
+            );
+          }
+        });
+        this.todoList.splice(idx, 1);
+      }
+    });
+  }
+
+  private async dateFetch() {
+    await fetch("http://localhost:3000", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        this.todoList = data;
+        this.dateRender(this.todoList);
+      });
   }
 
   private timeCheck() {
@@ -77,14 +123,38 @@ class App {
         }
 
         $All("form")?.forEach((form) => {
-          form.addEventListener("submit", (e) => {
+          form.addEventListener("submit", async (e) => {
             e.preventDefault();
+            const targetday = e.target! as HTMLElement;
+            const selectedDay =
+              targetday.closest(".date")?.firstChild?.textContent;
+
             const form = target.querySelector("form")! as HTMLFormElement;
+
             const input = target.querySelector(
               ".todo_input"
             )! as HTMLInputElement;
 
             const input_value = input.value;
+            console.log(input_value);
+
+            const data: todoList = {
+              year: nowYear,
+              month: nowMonth,
+              day: Number(selectedDay),
+              body: input_value,
+            };
+
+            fetch("http://localhost:3000", {
+              method: "POST",
+              body: JSON.stringify(data),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            })
+              .then((res) => res.json())
+              .then((data) => console.log(data))
+              .catch((err) => console.log(err));
 
             form.remove();
 
@@ -172,7 +242,7 @@ class App {
     this.item.classList.add("shifting");
     const length = $All(".calender").length;
 
-    if (posFinal - posInitial < -50) {
+    if (posFinal - posInitial < -20) {
       this.item.style.left = posInitial - 1200 + "px";
       this.totalIdx++;
 
@@ -185,7 +255,7 @@ class App {
       }
 
       this.arrowRender(posInitial, length, allow, "right");
-    } else if (posFinal - posInitial > 50) {
+    } else if (posFinal - posInitial > 20) {
       this.calenders.style.left = posInitial + 1200 + "px";
       this.totalIdx--;
       posInitial += 1200;
@@ -207,6 +277,7 @@ class App {
   }
 
   arrowRender(posInitial: number, length: number, allow: boolean, dir: string) {
+    console.log("arrowrender");
     if (this.totalIdx == length) {
       new Calender(nowYear, nowMonth, today).rightArrow(
         $(".calenders")! as HTMLElement,
@@ -226,16 +297,17 @@ class App {
         posInitial,
         allow
       );
-
       this.totalIdx = 0;
-
       empty++;
     }
 
-    $(".calenders")!.addEventListener("transitionend", () => (allow = true));
-    this.allDates = $All(".dates");
-    this.dateClick();
-    this.timeCheck();
+    $(".calenders")!.addEventListener("transitionend", () => {
+      allow = true;
+      this.allDates = $All(".dates");
+      this.timeCheck();
+      this.dateClick();
+      this.dateRender(this.todoList);
+    });
   }
 
   arrowFunction(dir: string) {
@@ -273,8 +345,31 @@ class App {
         }
         this.arrowRender(posInitial, length, allow, "right");
       }
+
+      console.log(nowYear, nowMonth);
     });
   }
 }
 
 new App($(".calenders")! as HTMLElement, nowYear, nowMonth, today);
+
+// const router = async () => {
+//   const routes = [
+//     { path: "/", view: () => console.log("Viewing Home") },
+//     { path: "/posts", view: () => console.log("Viewing Posts") },
+//     { path: "/settings", view: () => console.log("Viewing Settings") },
+//   ];
+
+//   const pageMatches = routes.map((route) => {
+//     return {
+//       route, // route: route
+//       isMatch: route.path === location.pathname,
+//     };
+//   });
+
+//   console.log(pageMatches);
+// };
+
+// document.addEventListener("DOMContentLoaded", () => {
+//   router();
+// });

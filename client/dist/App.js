@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Calender } from "./Calender.js";
 import { $, $All } from "./util.js";
 const date = new Date();
@@ -24,13 +33,47 @@ class App {
         this.arrowFunction(".left");
         this.arrowFunction(".right");
         this.allDates = $All(".dates");
-        // this.dateClick();
+        this.dateClick();
         this.item = $(".calenders");
         this.item.classList.add("shifting");
         this.item.onmousedown = this.dragStart.bind(this);
         this.item.addEventListener("touchmove", this.dragAction.bind(this));
         this.item.addEventListener("touchend", this.dragEnd.bind(this));
         this.item.addEventListener("touchstart", this.dragStart.bind(this));
+        this.dateFetch();
+    }
+    dateRender(dates) {
+        const Alldate = $All(".date");
+        console.log(nowYear, nowMonth);
+        console.log(dates);
+        dates === null || dates === void 0 ? void 0 : dates.forEach((date, idx) => {
+            let { year, month, day, body } = date;
+            if (nowYear === year && nowMonth === month) {
+                Alldate.forEach((el) => {
+                    var _a;
+                    const n = Number((_a = el.firstChild) === null || _a === void 0 ? void 0 : _a.textContent);
+                    if (n === day) {
+                        el.insertAdjacentHTML("beforeend", `<small class='todo_text'>${body}</small>`);
+                    }
+                });
+                this.todoList.splice(idx, 1);
+            }
+        });
+    }
+    dateFetch() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield fetch("http://localhost:3000", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                this.todoList = data;
+                this.dateRender(this.todoList);
+            });
+        });
     }
     timeCheck() {
         $(".month_current").textContent = `${nowMonth}`;
@@ -49,14 +92,34 @@ class App {
                 target.insertAdjacentHTML("beforeend", "<form type='submit'><input autofocus='true' max='30' class='todo_input' placeholder='  해야할일을 입력해주세요'/></form>");
             }
             (_a = $All("form")) === null || _a === void 0 ? void 0 : _a.forEach((form) => {
-                form.addEventListener("submit", (e) => {
+                form.addEventListener("submit", (e) => __awaiter(this, void 0, void 0, function* () {
+                    var _a, _b;
                     e.preventDefault();
+                    const targetday = e.target;
+                    const selectedDay = (_b = (_a = targetday.closest(".date")) === null || _a === void 0 ? void 0 : _a.firstChild) === null || _b === void 0 ? void 0 : _b.textContent;
                     const form = target.querySelector("form");
                     const input = target.querySelector(".todo_input");
                     const input_value = input.value;
+                    console.log(input_value);
+                    const data = {
+                        year: nowYear,
+                        month: nowMonth,
+                        day: Number(selectedDay),
+                        body: input_value,
+                    };
+                    fetch("http://localhost:3000", {
+                        method: "POST",
+                        body: JSON.stringify(data),
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                    })
+                        .then((res) => res.json())
+                        .then((data) => console.log(data))
+                        .catch((err) => console.log(err));
                     form.remove();
                     target.insertAdjacentHTML("beforeend", `<small class='todo_text'>${input_value}</small>`);
-                });
+                }));
             });
             // if (!this.start) {
             //   this.start = num;
@@ -124,7 +187,7 @@ class App {
         posFinal = this.item.offsetLeft;
         this.item.classList.add("shifting");
         const length = $All(".calender").length;
-        if (posFinal - posInitial < -50) {
+        if (posFinal - posInitial < -20) {
             this.item.style.left = posInitial - 1200 + "px";
             this.totalIdx++;
             posInitial -= 1200;
@@ -136,7 +199,7 @@ class App {
             }
             this.arrowRender(posInitial, length, allow, "right");
         }
-        else if (posFinal - posInitial > 50) {
+        else if (posFinal - posInitial > 20) {
             this.calenders.style.left = posInitial + 1200 + "px";
             this.totalIdx--;
             posInitial += 1200;
@@ -156,6 +219,7 @@ class App {
         drag = false;
     }
     arrowRender(posInitial, length, allow, dir) {
+        console.log("arrowrender");
         if (this.totalIdx == length) {
             new Calender(nowYear, nowMonth, today).rightArrow($(".calenders"), length, allow, this.totalIdx, empty, posInitial);
         }
@@ -164,10 +228,13 @@ class App {
             this.totalIdx = 0;
             empty++;
         }
-        $(".calenders").addEventListener("transitionend", () => (allow = true));
-        this.allDates = $All(".dates");
-        this.dateClick();
-        this.timeCheck();
+        $(".calenders").addEventListener("transitionend", () => {
+            allow = true;
+            this.allDates = $All(".dates");
+            this.timeCheck();
+            this.dateClick();
+            this.dateRender(this.todoList);
+        });
     }
     arrowFunction(dir) {
         const arrow = $(dir);
@@ -199,7 +266,25 @@ class App {
                 }
                 this.arrowRender(posInitial, length, allow, "right");
             }
+            console.log(nowYear, nowMonth);
         });
     }
 }
 new App($(".calenders"), nowYear, nowMonth, today);
+// const router = async () => {
+//   const routes = [
+//     { path: "/", view: () => console.log("Viewing Home") },
+//     { path: "/posts", view: () => console.log("Viewing Posts") },
+//     { path: "/settings", view: () => console.log("Viewing Settings") },
+//   ];
+//   const pageMatches = routes.map((route) => {
+//     return {
+//       route, // route: route
+//       isMatch: route.path === location.pathname,
+//     };
+//   });
+//   console.log(pageMatches);
+// };
+// document.addEventListener("DOMContentLoaded", () => {
+//   router();
+// });
