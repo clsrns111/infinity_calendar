@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Calender } from "./Calender.js";
+import { _filter } from "./Fn.js";
 import { $, $All } from "./util.js";
 const date = new Date();
 let nowMonth = date.getMonth() + 1;
@@ -43,22 +44,25 @@ class App {
         this.dateFetch();
     }
     dateRender(dates) {
+        var _a;
         const Alldate = $All(".date");
-        console.log(nowYear, nowMonth);
-        console.log(dates);
-        dates === null || dates === void 0 ? void 0 : dates.forEach((date, idx) => {
-            let { year, month, day, body } = date;
-            if (nowYear === year && nowMonth === month) {
-                Alldate.forEach((el) => {
-                    var _a;
-                    const n = Number((_a = el.firstChild) === null || _a === void 0 ? void 0 : _a.textContent);
-                    if (n === day) {
-                        el.insertAdjacentHTML("beforeend", `<small class='todo_text'>${body}</small>`);
-                    }
-                });
-                this.todoList.splice(idx, 1);
-            }
+        const filterdDate = _filter(Alldate, (el) => {
+            if (!el.dataset.date)
+                return false;
+            const dateYearMonth = el.dataset.date.split("-");
+            return nowYear === +dateYearMonth[0] && nowMonth === +dateYearMonth[1];
         });
+        console.log(filterdDate);
+        for (let i = 0; i < dates.length; i++) {
+            let { year, month, day, body } = dates[i];
+            for (let j = 0; j < filterdDate.length; j++) {
+                const target = filterdDate[j];
+                const n = Number((_a = target.firstChild) === null || _a === void 0 ? void 0 : _a.textContent);
+                if (year === nowYear && nowMonth === month && n === day) {
+                    target.insertAdjacentHTML("beforeend", `<small class='todo_text'>${body}</small>`);
+                }
+            }
+        }
     }
     dateFetch() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -101,13 +105,16 @@ class App {
                     const input = target.querySelector(".todo_input");
                     const input_value = input.value;
                     console.log(input_value);
+                    console.log(input);
+                    target.insertAdjacentHTML("beforeend", `<small class='todo_text'>${input_value}</small>`);
+                    form.remove();
                     const data = {
                         year: nowYear,
                         month: nowMonth,
                         day: Number(selectedDay),
                         body: input_value,
                     };
-                    fetch("http://localhost:3000", {
+                    yield fetch("http://localhost:3000", {
                         method: "POST",
                         body: JSON.stringify(data),
                         headers: {
@@ -117,8 +124,6 @@ class App {
                         .then((res) => res.json())
                         .then((data) => console.log(data))
                         .catch((err) => console.log(err));
-                    form.remove();
-                    target.insertAdjacentHTML("beforeend", `<small class='todo_text'>${input_value}</small>`);
                 }));
             });
             // if (!this.start) {
@@ -222,18 +227,19 @@ class App {
         console.log("arrowrender");
         if (this.totalIdx == length) {
             new Calender(nowYear, nowMonth, today).rightArrow($(".calenders"), length, allow, this.totalIdx, empty, posInitial);
+            this.dateRender(this.todoList);
         }
         if (this.totalIdx == -1) {
             new Calender(nowYear, nowMonth, today).leftArrow($(".calenders"), this.totalIdx, length, posInitial, allow);
             this.totalIdx = 0;
             empty++;
+            this.dateRender(this.todoList);
         }
         $(".calenders").addEventListener("transitionend", () => {
             allow = true;
             this.allDates = $All(".dates");
             this.timeCheck();
             this.dateClick();
-            this.dateRender(this.todoList);
         });
     }
     arrowFunction(dir) {
@@ -266,7 +272,6 @@ class App {
                 }
                 this.arrowRender(posInitial, length, allow, "right");
             }
-            console.log(nowYear, nowMonth);
         });
     }
 }

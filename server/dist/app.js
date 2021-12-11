@@ -15,14 +15,14 @@ const app = express();
 const port = 3000;
 app.use(cors({ credentials: true }));
 app.use(express.json());
-mongoose.connect("mongodb+srv://clsrns111:password@cluster0.vqh13.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", () => {
+mongoose.connect("mongodb+srv://clsrns111:4565123@cluster0.vqh13.mongodb.net/myFirstDatabase?retryWrites=true&w=majority", () => {
     console.log("mongoDB connected");
 });
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const alldata = yield todoModel.find({});
     if (!alldata) {
         res.status(501);
-        throw new Error("데이터가 없습니다.");
+        throw new Error();
     }
     res.status(201).send(alldata);
 }));

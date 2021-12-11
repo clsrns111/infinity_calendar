@@ -88,10 +88,10 @@ export class Calender extends Base {
         const img_text = this.element.querySelector(".img_text");
         img_text.textContent = `${this.nowMonth}`;
         for (let i = 0; i < firstDay; i++) {
-            datesEl.innerHTML += `<div class="date"></div>`;
+            datesEl.innerHTML += `<div class="date" data-date='${this.nowYear}-${this.nowMonth}'></div>`;
         }
         for (let i = 1; i <= this.Month_day; i++) {
-            this.dates.push(`<div class="date">${i}</div>`);
+            this.dates.push(`<div class="date" data-date='${this.nowYear}-${this.nowMonth}'>${i}</div>`);
         }
         this.dates.forEach((date) => {
             datesEl.innerHTML += date;

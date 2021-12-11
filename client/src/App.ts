@@ -1,4 +1,5 @@
 import { Calender } from "./Calender.js";
+import { _filter } from "./Fn.js";
 import { $, $All } from "./util.js";
 
 interface todoList {
@@ -66,24 +67,29 @@ class App {
   private dateRender(dates?: Array<object>) {
     const Alldate = $All(".date");
 
-    console.log(nowYear, nowMonth);
-    console.log(dates);
-    dates?.forEach((date, idx) => {
-      let { year, month, day, body } = date! as any;
-      if (nowYear === year && nowMonth === month) {
-        Alldate.forEach((el) => {
-          const n = Number(el.firstChild?.textContent);
-
-          if (n === day) {
-            el.insertAdjacentHTML(
-              "beforeend",
-              `<small class='todo_text'>${body}</small>`
-            );
-          }
-        });
-        this.todoList.splice(idx, 1);
-      }
+    const filterdDate = _filter(Alldate, (el) => {
+      if (!el.dataset.date) return false;
+      const dateYearMonth = el.dataset.date!.split("-");
+      return nowYear === +dateYearMonth[0] && nowMonth === +dateYearMonth[1];
     });
+
+    console.log(filterdDate);
+
+    for (let i = 0; i < dates!.length; i++) {
+      let { year, month, day, body } = dates![i] as any;
+
+      for (let j = 0; j < filterdDate.length; j++) {
+        const target = filterdDate[j] as any;
+
+        const n = Number(target!.firstChild?.textContent);
+        if (year === nowYear && nowMonth === month && n === day) {
+          target.insertAdjacentHTML(
+            "beforeend",
+            `<small class='todo_text'>${body}</small>`
+          );
+        }
+      }
+    }
   }
 
   private async dateFetch() {
@@ -128,15 +134,22 @@ class App {
             const targetday = e.target! as HTMLElement;
             const selectedDay =
               targetday.closest(".date")?.firstChild?.textContent;
-
             const form = target.querySelector("form")! as HTMLFormElement;
-
             const input = target.querySelector(
               ".todo_input"
             )! as HTMLInputElement;
 
             const input_value = input.value;
+
             console.log(input_value);
+            console.log(input);
+
+            target.insertAdjacentHTML(
+              "beforeend",
+              `<small class='todo_text'>${input_value}</small>`
+            );
+
+            form.remove();
 
             const data: todoList = {
               year: nowYear,
@@ -145,7 +158,7 @@ class App {
               body: input_value,
             };
 
-            fetch("http://localhost:3000", {
+            await fetch("http://localhost:3000", {
               method: "POST",
               body: JSON.stringify(data),
               headers: {
@@ -155,13 +168,6 @@ class App {
               .then((res) => res.json())
               .then((data) => console.log(data))
               .catch((err) => console.log(err));
-
-            form.remove();
-
-            target.insertAdjacentHTML(
-              "beforeend",
-              `<small class='todo_text'>${input_value}</small>`
-            );
           });
         });
 
@@ -287,6 +293,8 @@ class App {
         empty,
         posInitial
       );
+
+      this.dateRender(this.todoList);
     }
 
     if (this.totalIdx == -1) {
@@ -299,6 +307,8 @@ class App {
       );
       this.totalIdx = 0;
       empty++;
+
+      this.dateRender(this.todoList);
     }
 
     $(".calenders")!.addEventListener("transitionend", () => {
@@ -306,7 +316,6 @@ class App {
       this.allDates = $All(".dates");
       this.timeCheck();
       this.dateClick();
-      this.dateRender(this.todoList);
     });
   }
 
@@ -345,8 +354,6 @@ class App {
         }
         this.arrowRender(posInitial, length, allow, "right");
       }
-
-      console.log(nowYear, nowMonth);
     });
   }
 }
